@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my_app
+    restart: always
+    working_dir: /var/www/
+    volumes:
+      - ../:/var/www
+  nginx:
+    image: nginx:1.28.0-alpine
+    container_name: my_webs
+    restart: always
+    ports:
+      - "8001:80"
+    volumes:
+      - ../:/var/www
+      - ./nginx:/etc/nginx/conf.d
+  db:
+    container_name: my_db
+    image: mysql:8.0
+    volumes:
+      - ./storage/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3308:3306"
