@@ -11,17 +11,18 @@
     <table>
         <tr id="Label">
             Ваши Заметки
-
         </tr>
 
         <tr>
-            <td id="insert">
-                <label for="insert">
-                    Добавление заметок
-                    <br>
-                    <textarea rows="4" cols="50" name="insert" id="insert"></textarea>
-                    <button type="submit">Создать</button>
-                </label>
+            <td id="note_st">
+                <form method="post" action="">
+                    <label for="note">
+                        Добавление заметок
+                        <br>
+                        <textarea rows="4" cols="50" name="note" id="note"></textarea>
+                        <button type="submit">Создать</button>
+                    </label>
+                </form>
             </td>
         </tr>
 

@@ -48,7 +48,7 @@ class Router
     /**
      * @throws Exception
      */
-    public function resolve(string $requestURI, string $requestMethod):
+    public function resolve(string $requestURI, string $requestMethod)
     {
         try {
             $route = explode('?', $requestURI)[0];
