@@ -48,7 +48,7 @@ class Router
     /**
      * @throws Exception
      */
-    public function resolve(string $requestURI, string $requestMethod)
+    public function resolve(string $requestURI, string $requestMethod):
     {
         try {
             $route = explode('?', $requestURI)[0];
@@ -69,6 +69,7 @@ class Router
         } catch (Exception $e) {
             http_response_code(404);
             echo View::make('/Errors/Error404');
+            exit;
         }
     }
 }

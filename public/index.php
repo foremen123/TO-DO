@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use app\App;
+use app\Config;
 use app\Controllers\HomeController;
 use app\Router;
 use app\View;
@@ -26,10 +27,12 @@ try {
     echo View::make('Errors/error.500');
 }
 
+$config = new Config();
 new App(
     $router,
     [
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => strtolower($_SERVER['REQUEST_METHOD'])
-    ]
+    ],
+    $config,
 )->run();
