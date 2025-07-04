@@ -10,14 +10,14 @@ use PDO;
  * @mixin PDO
  */
 
-class Db
+class DB
 {
     private PDO $pdo;
 
-    public function __construct(Config $config)
+    public function __construct(array $config)
     {
         try {
-            $dsn = $config['driver'] . ':host=' . $config['host'] . ';dbname=' . $config['dbname'];
+            $dsn = $config['driver'] . ':host=' . $config['host'] . ';dbname=' . $config['database'];
             $username = $config['username'];
             $password = $config['password'];
             $defaultSettings =

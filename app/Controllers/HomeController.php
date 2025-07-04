@@ -22,18 +22,4 @@ class HomeController
     {
         return View::make('/Errors/Error500');
     }
-
-    #[Get('/register')]
-
-    public function authorization(): View
-    {
-        return View::make('/TO-DO/Authorization');
-    }
-
-    #[Get('/ToDo')]
-
-    public function Todo(): View
-    {
-        return View::make('/TO-DO/ToDo');
-    }
 }

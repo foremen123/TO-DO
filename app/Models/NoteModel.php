@@ -3,37 +3,21 @@
 namespace app\Models;
 
 use PDOException;
-use Ramsey\Uuid\Test\TestCase;
 
 class NoteModel extends Model
 {
-    public function addNote(): void
+    public function addNote(string $note, string $username): void
     {
-        try {
-            $this->db->beginTransaction();
-            $stmt = $this->db->prepare('INSERT INTO notes (note, username) VALUE (?, ?)');
-
-            $note = $_POST['note'];
-            $username = $_SESSION['username'];
-
-            if (! $stmt->execute([$note, $username])) {
-                throw new PDOException('note could\'nt be sent');
-            }
-            $this->db->commit();
-        } catch (PDOException $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
-            http_response_code(501);
-            throw new PDOException($e->getMessage());
+        $stmt = $this->db->prepare('INSERT INTO notes (note, username) VALUES (?, ?)');
+        if (! $stmt->execute([$note, $username])) {
+            throw new PDOException('note could\'nt be sent');
         }
     }
 
-    public function getNotes(): array
+    public function getNotes(string $username): array
     {
         try {
             $stmt = $this->db->prepare('SELECT * FROM notes WHERE username = ?');
-            $username = $_SESSION['username'];
             if (!$stmt->execute([$username])) {
                 throw new PDOException('note receipt failed');
             }

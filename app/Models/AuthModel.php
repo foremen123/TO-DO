@@ -6,42 +6,47 @@ use PDOException;
 
 class AuthModel extends Model
 {
-    public function registration(): void
+    public function registration(string $username, string $password): bool
     {
         try {
-            $stmt = $this->db->prepare('INSERT INTO users (username, password) VALUE (?, ?)');
-            $username = $_POST['username'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt->execute([$username, $password]);
+            $stmt = $this->db->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+
+            $hashPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            if (!$stmt->execute([$username, $hashPassword])) {
+                return false;
+            }
+            $_SESSION['username'] = $username;
+            return true;
+
         } catch (PDOException $e) {
             throw  new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
-    public function login(): bool
+    public function login(string $username, string $password): bool
     {
         try {
-            $stmt = $this->db->prepare('SELECT * FROM users WHERE ?');
-
-            $username = $_POST['username'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare('SELECT * FROM users WHERE username = ?');
 
             $stmt->execute([$username]);
             $user = $stmt->fetch();
 
-            if ($user && ($user['username'] === $username && $user['password'] === $password)) {
-                $_SESSION['userId'] = $user['id'];
+            if ($user && ($user['username'] === $username && password_verify($password, $user['password']))) {
                 $_SESSION['username'] = $user['username'];
                 return true;
             }
+
             return false;
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
-    public function isLoggedIn(): bool
+    public function test()
     {
-        return isset($_SESSION['userId']);
+        $stmt = $this->db->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+        $stmt->execute([123, 123]);
+
     }
 }

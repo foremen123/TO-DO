@@ -12,23 +12,22 @@ class View
 
     public function render(): string
     {
-        $viewFile = VIEW_PATH . $this->view . '.php';
-
-        if (!file_exists($viewFile)) {
+        try {
+            $viewFile = VIEW_PATH . $this->view . '.php';
+            if (!file_exists($viewFile)) {
+                throw new \Exception($viewFile . ' not found');
+            }
+            foreach ($this->params as $key => $value) {
+                $$key = $value;
+            }
+            ob_start();
+            include $viewFile;
+            return (string)ob_get_clean();
+        } catch (\Exception $e) {
             http_response_code(404);
             echo View::make('/Errors/Error.404');
             exit;
         }
-
-        foreach ($this->params as $key => $value) {
-            $$key = $value;
-        }
-
-        ob_start();
-
-        include $viewFile;
-
-        return (string) ob_get_clean();
     }
 
     static public function make(string $view, array $params = []): static

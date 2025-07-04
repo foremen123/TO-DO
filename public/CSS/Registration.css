@@ -1,0 +1,112 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #c31432 0%, #240b36 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* Форма */
+form {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 22px;
+    padding: 2.5rem 2rem 2rem 2rem;
+    box-shadow: 0 8px 32px rgba(80, 0, 20, 0.12);
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 1s ease;
+}
+
+/* Заголовок */
+h1.authorization {
+    color: #c31432;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    font-size: 2.1rem;
+    letter-spacing: 1.5px;
+}
+
+/* Метки и поля ввода */
+label {
+    width: 100%;
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    color: #240b36;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 0.4rem;
+    border: 1px solid #c31432;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1rem;
+    transition: border 0.3s, background 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border: 2px solid #c31432;
+    outline: none;
+    background: #fbeaec;
+}
+
+/* Кнопка отправки */
+button[type="submit"] {
+    margin-top: 0.7rem;
+    padding: 0.7rem 2.5rem;
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(80, 0, 20, 0.08);
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    color: #fff0f3;
+}
+
+/* Сообщение об ошибке */
+.alert {
+    background: #ffeaea;
+    color: #c31432;
+    border: 1px solid #ffc1e0;
+    font-weight: 500;
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.2rem;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(195, 20, 50, 0.12);
+    animation: fadeIn 0.8s ease;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

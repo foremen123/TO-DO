@@ -3,7 +3,7 @@
 namespace app\Models;
 
 use app\App;
-use app\Db;
+use app\DB;
 
 abstract class Model
 {
@@ -12,5 +12,10 @@ abstract class Model
     public function __construct()
     {
         $this->db = App::db();
+    }
+
+    public function isLoggedIn(): bool
+    {
+        return isset($_SESSION['username']);
     }
 }

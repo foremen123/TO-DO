@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
+session_start();
+
 use app\App;
 use app\Config;
+use app\Controllers\AuthController;
 use app\Controllers\HomeController;
+use app\Controllers\NoteController;
 use app\Router;
 use app\View;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv:: createImmutable ( __DIR__ );
+$dotenv = Dotenv\Dotenv:: createImmutable ( dirname(__DIR__ ));
 $dotenv -> load ();
 
 const VIEW_PATH = __DIR__ . '/../views/';
@@ -20,19 +24,20 @@ $router = new Router();
 try {
     $router->registerAttributeRoute(
         [
-            HomeController::class
+            HomeController::class,
+            AuthController::class,
+            NoteController::class,
         ]
     );
 } catch (ReflectionException $e) {
-    echo View::make('Errors/error.500');
+    return View::make('/Errors/Error500');
 }
 
-$config = new Config();
 new App(
     $router,
     [
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => strtolower($_SERVER['REQUEST_METHOD'])
     ],
-    $config,
+    new Config($_ENV),
 )->run();
