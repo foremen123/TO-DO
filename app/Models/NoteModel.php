@@ -2,6 +2,7 @@
 
 namespace app\Models;
 
+use app\SortNote;
 use app\View;
 use PDOException;
 
@@ -15,10 +16,12 @@ class NoteModel extends Model
         }
     }
 
-    public function getNotes(string $username): array
+    public function getNotes(string $username, SortNote $sortSetting): array
     {
         try {
-            $stmt = $this->db->prepare('SELECT * FROM notes WHERE username = ?');
+            $stmt = $this->db->prepare(
+                'SELECT * FROM notes WHERE username = ? ORDER BY ' . $sortSetting->getSort()
+            );
             if (!$stmt->execute([$username])) {
                 throw new PDOException('note receipt failed');
             }

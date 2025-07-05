@@ -8,6 +8,18 @@
 </head>
 <body>
 <div class="notes-container" role="main">
+    <div class="sort-wrapper">
+        <form method="get" id="sortForm" aria-label="Сортировка заметок">
+            <label for="sortSelect">Сортировка:</label>
+            <select name="sort" id="sortSelect" onchange="document.getElementById('sortForm').submit();">
+                <?php foreach ($sorts as $option): ?>
+                    <option value="<?= $option->value ?>" <?= ($_GET['sort'] ?? '') === $option->value ? 'selected' : '' ?>>
+                        <?= $option->label() ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </form>
+    </div>
     <h2 class="notes-title">Ваши Заметки: <?= htmlspecialchars($username ?? '') ?></h2>
 
     <div class="form-wrapper">
@@ -28,29 +40,34 @@
                     </p>
                     <small class="note-date"><?= htmlspecialchars($note['date']) ?></small>
 
-                    <form method="post" action="/doneNote">
-                    <input type="hidden" name="id" value="<?= $note['id'] ?>">
-                    <button type="submit" class="done-button" title="<?= $note['completed'] ? 'Отменить выполнение' : 'Отметить как выполненную' ?>">
-                        <?= $note['completed'] ? '↩️' : '✅' ?>
-                    </button>
-                    </form>
-
-                    <?php if (!$note['completed']): ?>
-                        <form method="get" action="/getEditId">
+                    <div class="note-actions">
+                        <form method="post" action="/doneNote">
                             <input type="hidden" name="id" value="<?= $note['id'] ?>">
-                            <button type="submit" class="edit-button">✏️</button>
+                            <button type="submit" class="done-button" title="<?= $note['completed'] ? 'Отменить выполнение' : 'Отметить как выполненную' ?>">
+                                <?= $note['completed'] ? '↩️' : '✅' ?>
+                            </button>
                         </form>
-                    <?php endif; ?>
 
-                    <form method="post" action="/deleteNote">
-                        <input type="hidden" name="id" value="<?= $note['id'] ?>">
-                        <button type="submit" class="delete-button">🗑️</button>
-                    </form>
+                        <?php if (!$note['completed']): ?>
+                            <form method="get" action="/getEditId">
+                                <input type="hidden" name="id" value="<?= $note['id'] ?>">
+                                <button type="submit" class="edit-button" title="Редактировать">✏️</button>
+                            </form>
+                        <?php endif; ?>
+
+                        <form method="post" action="/deleteNote">
+                            <input type="hidden" name="id" value="<?= $note['id'] ?>">
+                            <button type="submit" class="delete-button" title="Удалить">🗑️</button>
+                        </form>
+                    </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
             <div class="no-notes" aria-live="polite">Заметок пока нет</div>
         <?php endif; ?>
+        <div class="logout-container">
+            <a href="/logOut" id="logOut">Выйти</a>
+        </div>
     </div>
 </div>
 </body>

@@ -66,7 +66,7 @@ textarea:focus {
 /* Кнопка */
 button[type="submit"] {
     margin-top: 1rem;
-    align-self: flex-start;
+    align-self: center;
     padding: 0.7rem 2rem;
     background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
     color: #fff;
@@ -176,4 +176,106 @@ button[type="submit"]:hover {
 .done-button[disabled] {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+/* Контейнер для кнопок */
+.note-actions {
+    display: flex;
+    gap: 0.3rem;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+/* Общий стиль для маленьких кнопок */
+.note-actions button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Разные цвета для разных кнопок */
+.done-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.edit-button {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.note-actions button:hover {
+    opacity: 0.9;
+}
+
+/* Контейнер для кнопки выхода */
+.logout-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* Кнопка выхода */
+#logOut {
+    display: inline-block;
+    padding: 0.7rem 2rem;
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(80, 0, 20, 0.1);
+    transition: background 0.3s, color 0.3s;
+}
+
+#logOut:hover {
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    color: #fff0f3;
+}
+
+/* Обёртка сортировки */
+.sort-wrapper {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Метка сортировки */
+.sort-wrapper label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #240b36;
+    margin-bottom: 0.5rem;
+}
+
+/* Селект */
+.sort-wrapper select {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #c31432;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #fff 0%, #fbeaec 100%);
+    font-size: 1rem;
+    color: #240b36;
+    cursor: pointer;
+    transition: border 0.3s, background 0.3s;
+    box-shadow: 0 2px 4px rgba(80, 0, 20, 0.08);
+}
+
+.sort-wrapper select:focus {
+    outline: none;
+    border: 2px solid #c31432;
+    background: #fff0f3;
 }

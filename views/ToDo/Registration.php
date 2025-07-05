@@ -14,7 +14,11 @@
     <h1 class ='authorization'>Регистрация</h1>
 
     <?php if (!empty($error)): ?>
-        <div class="alert"><?=htmlspecialchars($error)?></div>
+        <div
+                class="alert"><?=htmlspecialchars($error)?>
+                <br>
+                <a href="/authorization">Авторизоваться</a>
+        </div>
     <?php endif; ?>
 
     <label for="username">

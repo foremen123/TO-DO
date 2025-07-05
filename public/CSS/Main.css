@@ -1,0 +1,84 @@
+/* Фон страницы */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #c31432 0%, #240b36 100%);
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Основной контейнер */
+.main-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 3rem 2rem;
+    border-radius: 22px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(80, 0, 20, 0.12);
+    animation: fadeIn 1s ease;
+}
+
+/* Заголовок */
+.main-title {
+    color: #c31432;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+/* Подзаголовок */
+.main-subtitle {
+    color: #240b36;
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Кнопки */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.main-button {
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 12px rgba(80, 0, 20, 0.15);
+}
+
+.main-button:hover {
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    transform: scale(1.05);
+}
+
+.main-button.alt {
+    background: linear-gradient(90deg, #6d4e90 0%, #c31432 100%);
+}
+
+.main-button.alt:hover {
+    background: linear-gradient(90deg, #c31432 0%, #6d4e90 100%);
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

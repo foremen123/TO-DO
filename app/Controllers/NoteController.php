@@ -6,6 +6,7 @@ use app\Attributes\Get;
 use app\Attributes\Post;
 use app\Models\NoteModel;
 use app\NoteHelper\ToDoFormatter;
+use app\SortNote;
 use app\View;
 use Exception;
 
@@ -18,9 +19,11 @@ class NoteController
     {
         try {
             $username = $_SESSION['username'];
+            $sortParam = $_GET['sort'] ?? null;
+            $sort = SortNote::checkFromSort($sortParam);
 
             $noteModel = new NoteModel();
-            $notes = $noteModel->getNotes($username);
+            $notes = $noteModel->getNotes($username, $sort);
 
             $formattedNote = [];
 
@@ -33,6 +36,8 @@ class NoteController
                 [
                     'username' => $_SESSION['username'],
                     'notes' => $formattedNote,
+                    'sort' => $sort,
+                    'sorts' => SortNote::cases()
                 ]);
 
         } catch (Exception $e) {
@@ -156,5 +161,20 @@ class NoteController
             error_log($e->getMessage());
             echo View::make('/Error/Error500');
         }
+    }
+
+    #[Get('/logOut')]
+
+    public function logOut(): void
+    {
+        if (isset($_SESSION['username'])) {
+            unset($_SESSION['username']);
+
+            header('Location: /');
+            exit;
+        }
+
+        header('Location: /');
+        exit;
     }
 }
