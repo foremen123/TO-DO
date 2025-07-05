@@ -68,6 +68,8 @@ class Router
             throw new Exception("Method $method not found in class $class");
         } catch (Exception $e) {
             http_response_code(404);
+            error_log($e->getMessage());
+
             echo View::make('/Errors/Error404');
             exit;
         }

@@ -5,6 +5,7 @@ namespace app\Controllers;
 use app\Attributes\Get;
 use app\Attributes\Post;
 use app\Models\AuthModel;
+use app\NoteHelper\ToDoFormatter;
 use app\View;
 use PDOException;
 
@@ -28,8 +29,8 @@ class AuthController
 
     public function registrationUser(): void
     {
-        $username = trim($_POST['username']) ?? '';
-        $password = trim($_POST['password']) ?? '';
+        $username = ToDoFormatter::formattedNote($_POST['username']) ?? '';
+        $password = ToDoFormatter::formattedNote($_POST['password']) ?? '';
 
         if ($username === '' || $password === '') {
             echo View::make(
@@ -59,8 +60,8 @@ class AuthController
     public function authorizationUser(): void
     {
         try {
-            $username = $_POST['username'];
-            $password = $_POST['password'];
+            $username = ToDoFormatter::formattedNote($_POST['username']);
+            $password = ToDoFormatter::formattedNote($_POST['password']);
 
             $authModel = new AuthModel();
 
@@ -74,6 +75,7 @@ class AuthController
             );
 
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             throw new PDOException($e->getMessage());
         }
     }

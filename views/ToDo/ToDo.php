@@ -2,62 +2,56 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заметки</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 2rem;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            max-width: 800px;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        textarea {
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="/CSS/ToDo.css">
 </head>
 <body>
-<h2>Ваши Заметки: <?= htmlspecialchars($username ?? '') ?></h2>
+<div class="notes-container" role="main">
+    <h2 class="notes-title">Ваши Заметки: <?= htmlspecialchars($username ?? '') ?></h2>
 
-<form method="post" action="/createNote">
-    <label for="note">
-        Добавление заметки:<br>
-        <textarea rows="4" name="note" id="note"></textarea><br>
-        <button type="submit">Создать</button>
-    </label>
-</form>
+    <div class="form-wrapper">
+        <form method="post" action="/createNote" aria-label="Форма создания новой заметки">
+            <label for="note">Добавление заметки:</label>
+            <textarea name="note" id="note" rows="4" placeholder="Введите вашу заметку..." required></textarea>
+            <button type="submit">Создать</button>
+        </form>
+    </div>
 
-<h3>Список заметок:</h3>
-<table>
-    <thead>
-    <tr>
-        <th>Заметка</th>
-        <th>Дата</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if (!empty($notes)): ?>
-        <?php foreach ($notes as $note): ?>
-            <tr>
-                <td><?= htmlspecialchars($note['note']) ?></td>
-                <td><?= htmlspecialchars($note['date']) ?></td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="2">Заметок пока нет</td>
-        </tr>
-    <?php endif; ?>
-    </tbody>
-</table>
+    <div class="notes-list" id="notesList">
+        <h3>Список заметок:</h3>
+        <?php if (!empty($notes)): ?>
+            <?php foreach ($notes as $note): ?>
+                <div class="note-item <?= $note['completed'] ? 'completed' : '' ?>" tabindex="0">
+                    <p class="note-text <?= $note['completed'] ? 'done-text' : '' ?>">
+                        <?= htmlspecialchars($note['note']) ?>
+                    </p>
+                    <small class="note-date"><?= htmlspecialchars($note['date']) ?></small>
+
+                    <form method="post" action="/doneNote">
+                    <input type="hidden" name="id" value="<?= $note['id'] ?>">
+                    <button type="submit" class="done-button" title="<?= $note['completed'] ? 'Отменить выполнение' : 'Отметить как выполненную' ?>">
+                        <?= $note['completed'] ? '↩️' : '✅' ?>
+                    </button>
+                    </form>
+
+                    <?php if (!$note['completed']): ?>
+                        <form method="get" action="/getEditId">
+                            <input type="hidden" name="id" value="<?= $note['id'] ?>">
+                            <button type="submit" class="edit-button">✏️</button>
+                        </form>
+                    <?php endif; ?>
+
+                    <form method="post" action="/deleteNote">
+                        <input type="hidden" name="id" value="<?= $note['id'] ?>">
+                        <button type="submit" class="delete-button">🗑️</button>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="no-notes" aria-live="polite">Заметок пока нет</div>
+        <?php endif; ?>
+    </div>
+</div>
 </body>
 </html>

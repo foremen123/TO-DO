@@ -1,0 +1,153 @@
+/* EditedNote.css */
+
+/* Общий фон */
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #c31432 0%, #240b36 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 3rem;
+}
+
+/* Контейнер формы редактирования заметки */
+.edit-note-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 22px;
+    padding: 2.5rem 3rem;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(80, 0, 20, 0.12);
+    animation: fadeIn 1s ease;
+}
+
+/* Заголовок */
+.edit-note-container h1 {
+    color: #c31432;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+/* Форма */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Метка для textarea */
+label[for="editedNote"] {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #240b36;
+    margin-bottom: 0.7rem;
+    user-select: none;
+}
+
+/* Текстовое поле */
+textarea {
+    resize: vertical;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #c31432;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    background: #fff;
+    min-height: 150px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    line-height: 1.4;
+}
+
+/* Фокус на textarea */
+textarea:focus {
+    border-color: #a90f26;
+    background: #fbeaec;
+    box-shadow: 0 0 8px rgba(195, 20, 50, 0.4);
+    outline: none;
+}
+
+/* Placeholder */
+textarea::placeholder {
+    color: #c31432;
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Строка с кнопками */
+.buttons-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.8rem;
+    justify-content: flex-start;
+    width: max-content;
+}
+
+/* Кнопка отправки */
+button[type="submit"] {
+    padding: 0.75rem 2.5rem;
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 10px rgba(80, 0, 20, 0.15);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+/* Hover для submit */
+button[type="submit"]:hover,
+button[type="submit"]:focus {
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    color: #fff0f3;
+    box-shadow: 0 4px 15px rgba(195, 20, 50, 0.5);
+    outline: none;
+}
+
+/* Ссылка-кнопка «Обратно» */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2.5rem;
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 3px 10px rgba(80, 0, 20, 0.15);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+/* Hover для ссылки-кнопки */
+.btn-back:hover {
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff0f3;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

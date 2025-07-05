@@ -16,24 +16,61 @@ class NoteController
 
     public function Todo(): View
     {
-        $username = $_SESSION['username'];
+        try {
+            $username = $_SESSION['username'];
 
-        $noteModel = new NoteModel();
-        $notes = $noteModel->getNotes($username);
+            $noteModel = new NoteModel();
+            $notes = $noteModel->getNotes($username);
 
-        return View::make('/ToDo/ToDo',
-            [
-                'username' => $_SESSION['username'],
-                'notes' => $notes
-            ]);
+            $formattedNote = [];
+
+            foreach ($notes as $note) {
+                $note['date'] = ToDoFormatter::formattedDate($note['date']);
+
+                $formattedNote[] = $note;
+            }
+            return View::make('/ToDo/ToDo',
+                [
+                    'username' => $_SESSION['username'],
+                    'notes' => $formattedNote,
+                ]);
+
+        } catch (Exception $e) {
+
+            error_log($e->getMessage());
+            return View::make('/Error/Error500');
+        }
+    }
+
+    #[Get('/getEditId')]
+
+    public function getEditId(): void
+    {
+        try {
+            if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+                throw new Exception('Not found id');
+            }
+
+            $id = $_GET['id'];
+
+            $noteModel = new NoteModel();
+            $note = $noteModel->getNoteId($id);
+
+            echo View::make('/ToDo/EditedNote', ['note' => $note]);
+        } catch (Exception $e) {
+            http_response_code(502);
+            error_log($e->getMessage());
+
+            echo View::make('Error/Error500');
+        }
     }
 
     #[Post('/createNote')]
-    public function createNote():void
+    public function createNote(): void
     {
         try {
-            $note = ToDoFormatter::formatterNote($_POST['note']) ?? '';
-            $username = ToDoFormatter::formatterNote($_SESSION['username']) ?? '';
+            $note = ToDoFormatter::formattedNote($_POST['note']) ?? '';
+            $username = ToDoFormatter::formattedNote($_SESSION['username']) ?? '';
 
             if ($note === '' || $username === '') {
                 throw new Exception('Not found note or username');
@@ -48,7 +85,76 @@ class NoteController
             header('Location:/ToDo');
 
         } catch (\Exception $e) {
+            error_log($e->getMessage());
             echo View::make('/ErrorTest');
+        }
+    }
+
+    #[Post('/deleteNote')]
+
+    public function deleteNote(): void
+    {
+        try {
+            $id = $_POST['id'] ??'';
+
+            if ($id === '') {
+                throw new Exception('Not found id');
+            }
+
+            $noteModel = new NoteModel();
+            $noteModel->deleteNote($id);
+
+            header('Location: /ToDo');
+        } catch (Exception) {
+            echo View::make('/Error/Error500');
+        }
+    }
+
+    #[Post('/editNote')]
+
+    public function editNote(): void
+    {
+        try {
+            $id = $_POST['id'] ?? '';
+            $note = $_POST['editedNote'] ?? '';
+
+            if ($id === '' || $note === '') {
+                throw new Exception('Not found id or note');
+            }
+
+            $noteModel = new NoteModel();
+            $noteModel->editNote($id, $note);
+
+            header('Location: /ToDo');
+        } catch (Exception $e) {
+
+            error_log($e->getMessage());
+            echo View::make('/Error/Error500');
+        }
+    }
+
+    #[Post('/doneNote')]
+
+    public function doneNote(): void
+    {
+        try {
+            $id = $_POST['id'] ?? '';
+            if ($id === '') {
+                throw new Exception('Not found id');
+            }
+            $noteModel = new NoteModel();
+
+            $note = $noteModel->getNoteId($id);
+            if (empty($note)) {
+                throw new Exception('Not found note');
+            }
+            $completed = $note['completed'] ?? 0;
+            $noteModel->setDoneNote($id, !$completed);
+
+            header('Location: /ToDo');
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            echo View::make('/Error/Error500');
         }
     }
 }

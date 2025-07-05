@@ -14,6 +14,9 @@ class DB
 {
     private PDO $pdo;
 
+    /**
+     * @throws \Exception
+     */
     public function __construct(array $config)
     {
         try {
@@ -27,6 +30,7 @@ class DB
                 ];
             $this->pdo = new PDO ($dsn, $username, $password, $defaultSettings);
         } catch (\Exception $e) {
+            error_log($e->getMessage());
             throw new \Exception($e->getMessage());
         }
     }

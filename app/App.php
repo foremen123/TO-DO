@@ -30,7 +30,9 @@ class App
         } catch (Exception $e) {
             http_response_code(500);
 
+            error_log($e->getMessage());
             echo View::make('Errors/Error500');
+            exit;
         }
     }
 

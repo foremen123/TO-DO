@@ -1,0 +1,179 @@
+/* Общий фон */
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #c31432 0%, #240b36 100%);
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 3rem;
+}
+
+/* Контейнер заметок */
+.notes-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 22px;
+    padding: 2.5rem 2rem;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(80, 0, 20, 0.12);
+    animation: fadeIn 1s ease;
+}
+
+/* Заголовок */
+.notes-title {
+    color: #c31432;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* Форма создания заметки */
+.form-wrapper form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+
+.form-wrapper label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #240b36;
+    margin-bottom: 0.5rem;
+}
+
+textarea {
+    resize: vertical;
+    padding: 0.7rem;
+    border: 1px solid #c31432;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border 0.3s, background 0.3s;
+    background: #fff;
+    min-height: 100px;
+}
+
+textarea:focus {
+    border: 2px solid #c31432;
+    outline: none;
+    background: #fbeaec;
+}
+
+/* Кнопка */
+button[type="submit"] {
+    margin-top: 1rem;
+    align-self: flex-start;
+    padding: 0.7rem 2rem;
+    background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+    box-shadow: 0 2px 8px rgba(80, 0, 20, 0.08);
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, #240b36 0%, #c31432 100%);
+    color: #fff0f3;
+}
+
+/* Список заметок */
+.notes-list h3 {
+    color: #240b36;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #c31432;
+    padding-bottom: 0.5rem;
+}
+
+.note-item {
+    background: #fff8f9;
+    border-left: 5px solid #c31432;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(195, 20, 50, 0.08);
+    transition: transform 0.2s;
+}
+
+.note-item:hover {
+    transform: scale(1.02);
+}
+
+.note-text {
+    font-size: 1rem;
+    color: #240b36;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+}
+
+.note-date {
+    font-size: 0.85rem;
+    color: #a55;
+}
+
+/* Нет заметок */
+.no-notes {
+    font-size: 1rem;
+    color: #c31432;
+    text-align: center;
+    padding: 1rem;
+    background: #fff0f3;
+    border: 1px solid #ffc1e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(195, 20, 50, 0.08);
+    animation: fadeIn 0.8s ease;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.update-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.note-item.highlight {
+    border: 2px solid #28a745;
+    background-color: #f0fff4;
+    transition: background-color 0.5s ease;
+}
+
+/* Выполненная задача */
+.note-item.completed {
+    opacity: 0.6;
+    background-color: #e0f7e0;
+    border-left-color: #28a745;
+}
+
+.done-text {
+    text-decoration: line-through;
+    color: #555;
+}
+
+.done-button[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
