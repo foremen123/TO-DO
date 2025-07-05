@@ -3,7 +3,6 @@
 namespace app\Models;
 
 use app\View;
-use mysql_xdevapi\Exception;
 use PDOException;
 
 class NoteModel extends Model
