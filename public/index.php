@@ -9,6 +9,7 @@ use app\Config;
 use app\Controllers\AuthController;
 use app\Controllers\HomeController;
 use app\Controllers\NoteController;
+use app\DI\Container;
 use app\Router;
 use app\View;
 
@@ -19,7 +20,9 @@ $dotenv -> load ();
 
 const VIEW_PATH = __DIR__ . '/../views/';
 
-$router = new Router();
+$container = new Container();
+$router = new Router($container);
+
 
 try {
     $router->registerAttributeRoute(

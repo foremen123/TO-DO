@@ -7,6 +7,7 @@ use app\DB;
 
 abstract class Model
 {
+
     protected DB $db;
 
     public function __construct()

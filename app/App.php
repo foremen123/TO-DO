@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app;
 
+use app\DI\Container;
 use Exception;
 
 class App
@@ -14,7 +15,8 @@ class App
     public function __construct(
         protected Router $router,
         protected array $request,
-        protected Config $config
+        protected Config $config,
+
     )
     {
         static::$db = new DB($config->db ?? []);
