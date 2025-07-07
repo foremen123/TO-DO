@@ -1,0 +1,12 @@
+composer require vlucas/phpdotenv
+composer require --dev phpunit/phpunit
+sudo apt update
+sudo apt install php8.4-xml
+
+
+
+"autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
