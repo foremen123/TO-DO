@@ -2,8 +2,7 @@
 
 namespace app\Models;
 
-use app\SortNote;
-use app\View;
+use app\Enums\SortNote;
 use PDOException;
 
 class NoteModel extends Model

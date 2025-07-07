@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app;
 
 use app\Attributes\Route;
+use app\DI\Container;
 use Exception;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -12,6 +13,11 @@ use ReflectionException;
 
 class Router
 {
+
+    public function __construct(protected Container $container)
+    {
+    }
+
     private array $routes = [];
 
     public function register(string $requestMethod, string $route, callable|array $action): self
@@ -61,8 +67,9 @@ class Router
             }
             [$class, $method] = $action;
             if (class_exists($class)) {
+                $class = $this->container->get($class);
                 if (method_exists($class, $method)) {
-                    return call_user_func_array([new $class, $method], []);
+                    return call_user_func_array([$class, $method], []);
                 }
             }
             throw new Exception("Method $method not found in class $class");

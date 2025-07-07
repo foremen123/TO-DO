@@ -4,15 +4,20 @@ namespace app\Controllers;
 
 use app\Attributes\Get;
 use app\Attributes\Post;
+use app\Enums\SortNote;
 use app\Models\NoteModel;
 use app\NoteHelper\ToDoFormatter;
-use app\SortNote;
 use app\View;
 use Exception;
 
 
 class NoteController
 {
+
+    public function __construct(protected NoteModel $noteModel)
+    {
+    }
+
     #[Get('/ToDo')]
 
     public function Todo(): View
@@ -22,8 +27,7 @@ class NoteController
             $sortParam = $_GET['sort'] ?? null;
             $sort = SortNote::checkFromSort($sortParam);
 
-            $noteModel = new NoteModel();
-            $notes = $noteModel->getNotes($username, $sort);
+            $notes = $this->noteModel->getNotes($username, $sort);
 
             $formattedNote = [];
 
@@ -58,8 +62,7 @@ class NoteController
 
             $id = $_GET['id'];
 
-            $noteModel = new NoteModel();
-            $note = $noteModel->getNoteId($id);
+            $note = $this->noteModel->getNoteId($id);
 
             echo View::make('/ToDo/EditedNote', ['note' => $note]);
         } catch (Exception $e) {
@@ -81,10 +84,9 @@ class NoteController
                 throw new Exception('Not found note or username');
             }
 
-            $noteModel = new NoteModel();
-            $noteModel->addNote($note, $username);
+            $this->noteModel->addNote($note, $username);
 
-            if (!$noteModel->isLoggedIn()) {
+            if (!$this->noteModel->isLoggedIn()) {
                 throw new Exception('You are not logged in');
             }
             header('Location:/ToDo');
@@ -106,8 +108,7 @@ class NoteController
                 throw new Exception('Not found id');
             }
 
-            $noteModel = new NoteModel();
-            $noteModel->deleteNote($id);
+            $this->noteModel->deleteNote($id);
 
             header('Location: /ToDo');
         } catch (Exception) {
@@ -127,8 +128,7 @@ class NoteController
                 throw new Exception('Not found id or note');
             }
 
-            $noteModel = new NoteModel();
-            $noteModel->editNote($id, $note);
+            $this->noteModel->editNote($id, $note);
 
             header('Location: /ToDo');
         } catch (Exception $e) {
@@ -147,14 +147,13 @@ class NoteController
             if ($id === '') {
                 throw new Exception('Not found id');
             }
-            $noteModel = new NoteModel();
 
-            $note = $noteModel->getNoteId($id);
+            $note = $this->noteModel->getNoteId($id);
             if (empty($note)) {
                 throw new Exception('Not found note');
             }
             $completed = $note['completed'] ?? 0;
-            $noteModel->setDoneNote($id, !$completed);
+            $this->noteModel->setDoneNote($id, !$completed);
 
             header('Location: /ToDo');
         } catch (Exception $e) {
