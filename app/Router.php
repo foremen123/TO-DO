@@ -6,6 +6,7 @@ namespace app;
 
 use app\Attributes\Route;
 use app\DI\Container;
+use app\Exceptions\RouteNotFoundException;
 use Exception;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -51,34 +52,23 @@ class Router
         return $this->routes;
     }
 
-    /**
-     * @throws Exception
-     */
     public function resolve(string $requestURI, string $requestMethod)
     {
-        try {
-            $route = explode('?', $requestURI)[0];
-            $action = $this->routes[$requestMethod][$route] ?? null;
-            if (!$action) {
-                throw new Exception('Route not found');
-            }
-            if (is_callable($action)) {
-                return call_user_func($action);
-            }
-            [$class, $method] = $action;
-            if (class_exists($class)) {
-                $class = $this->container->get($class);
-                if (method_exists($class, $method)) {
-                    return call_user_func_array([$class, $method], []);
-                }
-            }
-            throw new Exception("Method $method not found in class $class");
-        } catch (Exception $e) {
-            http_response_code(404);
-            error_log($e->getMessage());
-
-            echo View::make('/Errors/Error404');
-            exit;
+        $route = explode('?', $requestURI)[0];
+        $action = $this->routes[$requestMethod][$route] ?? null;
+        if (!$action) {
+            throw new RouteNotFoundException('Route not found');
         }
+        if (is_callable($action)) {
+            return call_user_func($action);
+        }
+        [$class, $method] = $action;
+        if (class_exists($class)) {
+            $instance = $this->container->get($class);
+            if (method_exists($class, $method)) {
+                return call_user_func_array([$instance, $method], []);
+            }
+        }
+        throw new RouteNotFoundException("Method $method not found in class $class");
     }
 }

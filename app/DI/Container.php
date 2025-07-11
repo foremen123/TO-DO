@@ -3,6 +3,8 @@
 namespace app\DI;
 
 use app\Exceptions\IsNotInstantiable;
+use app\Exceptions\RouteNotFoundException;
+use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -47,43 +49,42 @@ class Container implements ContainerInterface
 
     public function resolve(string $id): Object
     {
-        $reflection = new ReflectionClass($id);
-
-        if (! $reflection->isInstantiable()) {
-            throw new IsNotInstantiable();
-        }
-
-        $getConstruct = $reflection->getConstructor();
-
-        if (! $getConstruct) {
-            return new $id;
-        }
-
-        $params = $getConstruct->getParameters();
-        if (! $params) {
-            return new $id;
-        }
-
-        $dependencies = array_map(function (ReflectionParameter $param) {
-            $name = $param->getName();
-            $type = $param->getType();
-
-            if (!$type) {
-                throw new IsNotInstantiable('This parameter' . $name . ' don\'t have type hint');
+        try {
+            $reflection = new ReflectionClass($id);
+            if (!$reflection->isInstantiable()) {
+                throw new IsNotInstantiable();
             }
-
-            if ($type instanceof ReflectionUnionType) {
-                throw new IsNotInstantiable('This parameter' . $name . ' have union type');
+            $getConstruct = $reflection->getConstructor();
+            if (!$getConstruct) {
+                return new $id;
             }
-
-            if ($type instanceof ReflectionNamedType && ! $type->isBuiltin())
-            {
-                return $this->get($type->getName());
+            $params = $getConstruct->getParameters();
+            if (!$params) {
+                return new $id;
             }
+            $dependencies = array_map(function (ReflectionParameter $param) {
+                $name = $param->getName();
+                $type = $param->getType();
 
-            throw new IsNotInstantiable('This parameter' . $name . ' have not built-in type');
-        },$params);
+                if (!$type) {
+                    throw new RouteNotFoundException('This parameter' . $name . ' don\'t have type hint');
+                }
 
-        return $reflection->newInstanceArgs($dependencies);
+                if ($type instanceof ReflectionUnionType) {
+                    throw new RouteNotFoundException('This parameter' . $name . ' have union type');
+                }
+
+                if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
+                    return $this->get($type->getName());
+                }
+
+                throw new RouteNotFoundException('This parameter' . $name . ' have not built-in type');
+            }, $params);
+            return $reflection->newInstanceArgs($dependencies);
+        } catch (RouteNotFoundException $e) {
+            throw new RouteNotFoundException('This class' . $id . ' not found');
+        } catch (Exception $e){
+            throw new Exception('This class' . $id . ' not found');
+        }
     }
 }

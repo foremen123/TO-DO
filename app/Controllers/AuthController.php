@@ -11,6 +11,10 @@ use PDOException;
 
 class AuthController
 {
+    public function __construct()
+    {
+    }
+
     #[Get('/registration')]
 
     public function registration(): View
