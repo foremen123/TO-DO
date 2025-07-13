@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace app;
 
+use app\Models\PdoWrapper;
+use app\interface\DatabaseInterface;
 use PDO;
+use PDOStatement;
 
 /**
  * @mixin PDO
  */
 
-class DB
+class DB implements DatabaseInterface
 {
     private PDO $pdo;
-
-    /**
-     * @throws \Exception
-     */
+    private pdoWrapper $pdoWrapper;
     public function __construct(array $config)
     {
         try {
@@ -33,10 +33,16 @@ class DB
             error_log($e->getMessage());
             throw new \Exception($e->getMessage());
         }
+        $this->pdoWrapper = new PdoWrapper($this->pdo);
     }
 
-    public function __call(string $name, array $arguments)
+    public function getPdoWrapper(): DatabaseInterface
     {
-        return call_user_func_array([$this->pdo, $name], $arguments);
+        return $this->pdoWrapper;
+    }
+
+    public function prepare(string $query): PDOStatement
+    {
+        return $this->pdo->prepare($query);
     }
 }
