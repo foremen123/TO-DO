@@ -2,45 +2,49 @@
 
 namespace app\Models;
 
+use app\interface\DatabaseInterface;
+use app\Models;
 use app\Enums\SortNote;
+use app\interface\NoteRepositoryInterface;
 use PDOException;
 
-class NoteModel extends Model
+class NoteModel extends Model implements NoteRepositoryInterface
 {
-    public function addNote(string $note, string $username): void
+    public function __construct(?DatabaseInterface $db = null)
+    {
+        parent::__construct($db);
+    }
+
+    public function addNote(string $note, string $username): bool
     {
         $stmt = $this->db->prepare('INSERT INTO notes (note, username) VALUES (?, ?)');
         if (!$stmt->execute([$note, $username])) {
-            throw new PDOException('note could\'nt be sent');
+            return false;
         }
+        return true;
     }
 
     public function getNotes(string $username, SortNote $sortSetting): array
     {
-        try {
-            $stmt = $this->db->prepare(
-                'SELECT * FROM notes WHERE username = ? ORDER BY ' . $sortSetting->getSort()
+        $stmt = $this->db->prepare(
+            'SELECT * FROM notes WHERE username = ? ORDER BY ' . $sortSetting->getSort()
             );
-            if (!$stmt->execute([$username])) {
-                throw new PDOException('note receipt failed');
-            }
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
-            http_response_code(502);
-            error_log($e->getMessage());
-            throw new PDOException($e->getMessage());
+        if (!$stmt->execute([$username])) {
+            throw new PDOException('note receipt failed');
         }
+            return $stmt->fetchAll();
+
+
     }
 
-    public function deleteNote(string $id,): void
+    public function deleteNote(string $id): bool
     {
         $stmt = $this->db->prepare('DELETE FROM notes WHERE id = ?');
         if (!$stmt->execute([$id])){
             throw new PDOException('note could\'nt be deleted');
         }
+
+        return true;
     }
 
     public function getNoteId(string $id): array
@@ -54,7 +58,7 @@ class NoteModel extends Model
         return $stmt->fetch();
     }
 
-    public function editNote(string $id, string $note): void
+    public function editNote(string $id, string $note): bool
     {
         $stmt = $this->db->prepare(
             'UPDATE notes SET note = :note, date = CURRENT_TIMESTAMP WHERE id = :id'
@@ -67,14 +71,17 @@ class NoteModel extends Model
         if ($stmt->rowCount() === 0) {
             throw new PDOException('Note not found or not updated');
         }
+        return true;
     }
 
-    public function setDoneNote(string $id, bool $completed): void
+    public function setDoneNote(string $id, bool $completed): bool
     {
         $stmt = $this->db->prepare('UPDATE notes SET completed = ? WHERE id = ?');
 
         if (!$stmt->execute([(int) $completed, $id])) {
             throw new PDOException('Failed to update completed');
         }
+
+        return true;
     }
 }

@@ -21,7 +21,7 @@ class RouterTest extends TestCase
     }
 
     #[Test]
-    public function it_register_route_into_router()
+    public function it_register_route_into_router(): void
     {
         $this->router->register('get', '/get', ['Users', 'index']);
         $this->router->register('post', '/post', ['Users', 'index']);
@@ -36,7 +36,7 @@ class RouterTest extends TestCase
     }
 
     #[Test]
-    public function it_return_empty_route()
+    public function it_return_empty_route(): void
     {
         $this->assertEmpty($this->router->routes());
     }
@@ -55,7 +55,7 @@ class RouterTest extends TestCase
     public function it_throw_exception_when_resolve_register(
         string $uri,
         string $method,
-        ?array $customController = null)
+        ?array $customController = null): void
     {
         if ($customController !== null) {
             $this->router->register($method, $uri, [$customController['class'], $customController['method']]);
@@ -71,17 +71,17 @@ class RouterTest extends TestCase
         string $requestUri,
         string $requestMethod,
         array $controller
-    )
+    ): void
     {
         $instance = new $controller['class'];
         $this->router->registerAttributeRoute([$instance]);
         $actually = $this->router->resolve($requestUri, $requestMethod);
 
-        $this->assertEquals(true , $actually);
+        $this->assertTrue($actually);
     }
 
     #[Test]
-    public function it_register_closure_into_route()
+    public function it_register_closure_into_route(): void
     {
         $closure = fn()=> 'hello';
         $this->router->register('get', '/get', $closure);

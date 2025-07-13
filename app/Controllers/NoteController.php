@@ -5,6 +5,8 @@ namespace app\Controllers;
 use app\Attributes\Get;
 use app\Attributes\Post;
 use app\Enums\SortNote;
+use app\Exceptions\NotCreatedNoteException;
+use app\interface\NoteRepositoryInterface;
 use app\Models\NoteModel;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
@@ -14,7 +16,7 @@ use Exception;
 class NoteController
 {
 
-    public function __construct(protected NoteModel $noteModel)
+    public function __construct(protected NoteRepositoryInterface $noteModel)
     {
     }
 
@@ -84,16 +86,20 @@ class NoteController
                 throw new Exception('Not found note or username');
             }
 
-            $this->noteModel->addNote($note, $username);
+            if (!$this->noteModel->addNote($note, $username)) {
+                throw new NotCreatedNoteException('This note is not created');
+            }
 
             if (!$this->noteModel->isLoggedIn()) {
                 throw new Exception('You are not logged in');
             }
             header('Location:/ToDo');
-
+        } catch (NotCreatedNoteException $e) {
+            error_log($e->getMessage());
+            echo View::make('/Error/Error500');
         } catch (\Exception $e) {
             error_log($e->getMessage());
-            echo View::make('/ErrorTest');
+            echo View::make('/Error/Error404');
         }
     }
 
@@ -128,7 +134,9 @@ class NoteController
                 throw new Exception('Not found id or note');
             }
 
-            $this->noteModel->editNote($id, $note);
+            if (!$this->noteModel->editNote($id, $note)) {
+                throw new Exception('This note is not edited');
+            }
 
             header('Location: /ToDo');
         } catch (Exception $e) {
@@ -153,7 +161,9 @@ class NoteController
                 throw new Exception('Not found note');
             }
             $completed = $note['completed'] ?? 0;
-            $this->noteModel->setDoneNote($id, !$completed);
+            if (! $this->noteModel->setDoneNote($id, !$completed)) {
+                throw new Exception('This note is not completed');
+            }
 
             header('Location: /ToDo');
         } catch (Exception $e) {

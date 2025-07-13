@@ -4,15 +4,16 @@ namespace app\Controllers;
 
 use app\Attributes\Get;
 use app\Attributes\Post;
-use app\Models\AuthModel;
+use app\interface\AuthRepositoryInterface;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
 use PDOException;
 
 class AuthController
 {
-    public function __construct()
+    public function __construct(protected AuthRepositoryInterface $authModel)
     {
+
     }
 
     #[Get('/registration')]
@@ -44,10 +45,8 @@ class AuthController
             return;
         }
 
-        $authModel = new AuthModel();
-
         try {
-            if ($authModel->registration($username, $password)) {
+            if ($this->authModel->registration($username, $password)) {
                 header('Location: /ToDo');
                 exit;
             }
@@ -67,9 +66,9 @@ class AuthController
             $username = ToDoFormatter::formattedNote($_POST['username']);
             $password = ToDoFormatter::formattedNote($_POST['password']);
 
-            $authModel = new AuthModel();
 
-            if ($authModel->login($username, $password)) {
+
+            if ($this->authModel->login($username, $password)) {
                 header('Location: /ToDo');
                 exit;
             }

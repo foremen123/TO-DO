@@ -82,9 +82,9 @@ class Container implements ContainerInterface
             }, $params);
             return $reflection->newInstanceArgs($dependencies);
         } catch (RouteNotFoundException $e) {
-            throw new RouteNotFoundException('This class' . $id . ' not found');
+            throw $e;
         } catch (Exception $e){
-            throw new Exception('This class' . $id . ' not found');
+            throw new Exception($e->getMessage());
         }
     }
 }
