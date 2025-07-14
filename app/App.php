@@ -11,6 +11,7 @@ use app\interface\DatabaseInterface;
 use app\interface\NoteRepositoryInterface;
 use app\Models\AuthModel;
 use app\Models\NoteModel;
+use app\NoteHelper\RedirectResponse;
 use Exception;
 
 class App
@@ -38,10 +39,21 @@ class App
     public function run(): void
     {
         try {
-            echo $this->router->resolve(
+            $response = $this->router->resolve(
                 $this->request['uri'],
                 $this->request['method']
             );
+
+            if ($response instanceof RedirectResponse) {
+                header("Location: {$response->location}");
+                exit;
+            }
+
+            if ($response instanceof View) {
+                echo $response->render();
+                return;
+            }
+            echo $response;
 
         } catch (RouteNotFoundException $e) {
             http_response_code(404);

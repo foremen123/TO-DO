@@ -1,6 +1,6 @@
 <?php
 
-namespace Models;
+namespace Tests\Unit\Models;
 
 use app\DI\Container;
 use app\Enums\SortNote;

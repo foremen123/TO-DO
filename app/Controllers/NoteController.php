@@ -8,6 +8,7 @@ use app\Enums\SortNote;
 use app\Exceptions\NotCreatedNoteException;
 use app\interface\NoteRepositoryInterface;
 use app\Models\NoteModel;
+use app\NoteHelper\RedirectResponse;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
 use Exception;
@@ -16,8 +17,9 @@ use Exception;
 class NoteController
 {
 
-    public function __construct(protected NoteRepositoryInterface $noteModel)
+    public function __construct(private readonly NoteRepositoryInterface $noteModel,)
     {
+
     }
 
     #[Get('/ToDo')]
@@ -48,14 +50,13 @@ class NoteController
 
         } catch (Exception $e) {
 
-            error_log($e->getMessage());
-            return View::make('/Error/Error500');
+            return View::make('/Errors/Error500');
         }
     }
 
     #[Get('/getEditId')]
 
-    public function getEditId(): void
+    public function getEditId(): View
     {
         try {
             if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -66,21 +67,20 @@ class NoteController
 
             $note = $this->noteModel->getNoteId($id);
 
-            echo View::make('/ToDo/EditedNote', ['note' => $note]);
+            return View::make('/ToDo/EditedNote', ['note' => $note]);
         } catch (Exception $e) {
             http_response_code(502);
-            error_log($e->getMessage());
 
-            echo View::make('Error/Error500');
+            return View::make('Errors/Error500');
         }
     }
 
     #[Post('/createNote')]
-    public function createNote(): void
+    public function createNote(): View|RedirectResponse
     {
         try {
-            $note = ToDoFormatter::formattedNote($_POST['note']) ?? '';
-            $username = ToDoFormatter::formattedNote($_SESSION['username']) ?? '';
+            $note = ToDoFormatter::formattedText($_POST['note']);
+            $username = ToDoFormatter::formattedText($_SESSION['username']);
 
             if ($note === '' || $username === '') {
                 throw new Exception('Not found note or username');
@@ -93,19 +93,17 @@ class NoteController
             if (!$this->noteModel->isLoggedIn()) {
                 throw new Exception('You are not logged in');
             }
-            header('Location:/ToDo');
+            return new RedirectResponse('/ToDo');
         } catch (NotCreatedNoteException $e) {
-            error_log($e->getMessage());
-            echo View::make('/Error/Error500');
+            return View::make('/Errors/Error500');
         } catch (\Exception $e) {
-            error_log($e->getMessage());
-            echo View::make('/Error/Error404');
+            return View::make('/Errors/Error404');
         }
     }
 
     #[Post('/deleteNote')]
 
-    public function deleteNote(): void
+    public function deleteNote(): View|RedirectResponse
     {
         try {
             $id = $_POST['id'] ??'';
@@ -114,17 +112,19 @@ class NoteController
                 throw new Exception('Not found id');
             }
 
-            $this->noteModel->deleteNote($id);
+            if (!$this->noteModel->deleteNote($id)) {
+                throw new Exception('Not deleted your note');
+            }
 
-            header('Location: /ToDo');
+            return new RedirectResponse('/ToDo');
         } catch (Exception) {
-            echo View::make('/Error/Error500');
+            return View::make('/Errors/Error500');
         }
     }
 
     #[Post('/editNote')]
 
-    public function editNote(): void
+    public function editNote(): View|RedirectResponse
     {
         try {
             $id = $_POST['id'] ?? '';
@@ -138,17 +138,15 @@ class NoteController
                 throw new Exception('This note is not edited');
             }
 
-            header('Location: /ToDo');
+            return new RedirectResponse('/ToDo');
         } catch (Exception $e) {
-
-            error_log($e->getMessage());
-            echo View::make('/Error/Error500');
+            return View::make('/Errors/Error500');
         }
     }
 
     #[Post('/doneNote')]
 
-    public function doneNote(): void
+    public function doneNote(): View|RedirectResponse
     {
         try {
             $id = $_POST['id'] ?? '';
@@ -165,25 +163,21 @@ class NoteController
                 throw new Exception('This note is not completed');
             }
 
-            header('Location: /ToDo');
+            return new RedirectResponse('/ToDo');
         } catch (Exception $e) {
-            error_log($e->getMessage());
-            echo View::make('/Error/Error500');
+            return View::make('/Errors/Error500');
         }
     }
 
     #[Get('/logOut')]
 
-    public function logOut(): void
+    public function logOut(): RedirectResponse
     {
         if (isset($_SESSION['username'])) {
             unset($_SESSION['username']);
 
-            header('Location: /');
-            exit;
+            return new RedirectResponse('/');
         }
-
-        header('Location: /');
-        exit;
+        return new RedirectResponse('/');
     }
 }
