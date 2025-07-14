@@ -7,9 +7,9 @@ use DateTimeZone;
 
 class ToDoFormatter
 {
-    static public function formattedNote(string $note): string
+    static public function formattedText(string $note): string
     {
-        return trim($note);
+        return trim($note) ?? '';
     }
 
     static public function formattedDate(string $date): string

@@ -43,4 +43,5 @@ new App(
         'method' => strtolower($_SERVER['REQUEST_METHOD'])
     ],
     new Config($_ENV),
+    $container
 )->run();

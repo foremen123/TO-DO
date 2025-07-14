@@ -4,13 +4,18 @@ namespace app\Controllers;
 
 use app\Attributes\Get;
 use app\Attributes\Post;
-use app\Models\AuthModel;
+use app\interface\AuthRepositoryInterface;
+use app\NoteHelper\RedirectResponse;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
 use PDOException;
 
 class AuthController
 {
+    public function __construct(protected AuthRepositoryInterface $authModel)
+    {
+    }
+
     #[Get('/registration')]
 
     public function registration(): View
@@ -27,57 +32,50 @@ class AuthController
 
     #[Post('/registrationUser')]
 
-    public function registrationUser(): void
+    public function registrationUser(): View|RedirectResponse
     {
-        $username = ToDoFormatter::formattedNote($_POST['username']) ?? '';
-        $password = ToDoFormatter::formattedNote($_POST['password']) ?? '';
+        $username = ToDoFormatter::formattedText($_POST['username']);
+        $password = ToDoFormatter::formattedText($_POST['password']);
 
         if ($username === '' || $password === '') {
-            echo View::make(
+            return View::make(
                 '/ToDo/Registration',
                 ['error' => 'Нельзя просто вставить пробелы']
             );
-            return;
+
         }
 
-        $authModel = new AuthModel();
-
         try {
-            if ($authModel->registration($username, $password)) {
-                header('Location: /ToDo');
-                exit;
+            if ($this->authModel->registration($username, $password)) {
+                return new RedirectResponse('/ToDo');
             }
         } catch (PDOException $e) {
-            echo View::make(
+            return View::make(
                 '/ToDo/Registration',
                 ['error' => 'Имя занято']
             );
         }
+        return View::make('/Errors/Error500');
     }
 
     #[Post('/authorizationUser')]
 
-    public function authorizationUser(): void
+    public function authorizationUser(): View|RedirectResponse
     {
         try {
-            $username = ToDoFormatter::formattedNote($_POST['username']);
-            $password = ToDoFormatter::formattedNote($_POST['password']);
+            $username = ToDoFormatter::formattedText($_POST['username']);
+            $password = ToDoFormatter::formattedText($_POST['password']);
 
-            $authModel = new AuthModel();
-
-            if ($authModel->login($username, $password)) {
-                header('Location: /ToDo');
-                exit;
+            if ($this->authModel->login($username, $password)) {
+                return new RedirectResponse('/ToDo');
             }
-            echo View::make(
+            return View::make(
                 '/ToDo/Authorization',
-                ['error' => 'Неверный логин или пароль. <a href="/registration">Зарегистрироваться</a>']
+                ['error' => 'Неверный логин или пароль']
             );
 
         } catch (PDOException $e) {
-            error_log($e->getMessage());
-            throw new PDOException($e->getMessage());
+            return View::make('/Errors/Error500');
         }
     }
-
 }

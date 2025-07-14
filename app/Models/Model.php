@@ -3,16 +3,14 @@
 namespace app\Models;
 
 use app\App;
-use app\DB;
+use app\interface\DatabaseInterface;
+use app\Models;
 
 abstract class Model
 {
-
-    protected DB $db;
-
-    public function __construct()
+    public function __construct(protected ?DatabaseInterface $db = null)
     {
-        $this->db = App::db();
+        $this->db = $db ?? App::db();
     }
 
     public function isLoggedIn(): bool
