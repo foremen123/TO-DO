@@ -13,4 +13,5 @@ interface NoteRepositoryInterface
     public function editNote(string $id, string $note): bool;
     public function setDoneNote(string $id, bool $completed): bool;
     public function isLoggedIn(): bool;
+    public function getNoteFromEmail(string $id): array;
 }

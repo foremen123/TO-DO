@@ -4,36 +4,35 @@ declare(strict_types=1);
 
 namespace app;
 
+use app\Controllers\EmailController;
 use app\DI\Container;
 use app\Exceptions\RouteNotFoundException;
 use app\interface\AuthRepositoryInterface;
 use app\interface\DatabaseInterface;
+use app\interface\EmailRepositoryInterface;
 use app\interface\NoteRepositoryInterface;
 use app\Models\AuthModel;
+use app\Models\EmailModel;
 use app\Models\NoteModel;
 use app\NoteHelper\RedirectResponse;
+use app\Service\CustomMailer;
+use Dotenv\Dotenv;
 use Exception;
+use Symfony\Component\Mailer\MailerInterface;
+use Twig\Environment;
 
 class App
 {
     static private DB $db;
+    private Config $config;
 
     public function __construct(
-        protected Router $router,
-        protected array $request,
-        protected Config $config,
-        protected Container $container
+        protected Container $container,
+        protected array $request = [],
+        protected ?Router $router = null
 
     )
     {
-        static::$db = new DB($config->db ?? []);
-
-        $this->container->set(Config::class, fn() => $this->config);
-        $this->container->set(DB::class, fn() => static::$db);
-        $this->container->set(DatabaseInterface::class, fn(Container $c) => static::$db);
-
-        $this->container->set(AuthRepositoryInterface::class, fn(Container $c) => $c->get(AuthModel::class));
-        $this->container->set(NoteRepositoryInterface::class, fn(Container $c) => $c->get(NoteModel::class));
     }
 
     public function run(): void
@@ -58,19 +57,44 @@ class App
         } catch (RouteNotFoundException $e) {
             http_response_code(404);
 
-            error_log($e->getMessage());
-            echo $e->getMessage() . $e->getCode() . $e->getFile() . $e->getLine();
+            echo View::make('Errors/Error404');
             exit;
         } catch (Exception $e) {
             http_response_code(500);
 
-            echo $e->getMessage() . $e->getFile() . $e->getCode();
+            echo $e->getMessage() . $e->getFile();
 
             error_log($e->getMessage());
             echo View::make('Errors/Error500');
             exit;
         }
 
+    }
+
+    public function boot(): static
+    {
+        $dotenv = Dotenv:: createImmutable(dirname(__DIR__));
+        $dotenv->load ();
+
+        $this->config = new Config($_ENV);
+
+        static::$db = new DB($this->config->db ?? []);
+
+        $this->container->set(Config::class, fn() => $this->config);
+        $this->container->set(DB::class, fn() => static::$db);
+        $this->container->set(DatabaseInterface::class, fn(Container $c) => static::$db);
+
+        $this->container->set(AuthRepositoryInterface::class, fn(Container $c) => $c->get(AuthModel::class));
+        $this->container->set(NoteRepositoryInterface::class, fn(Container $c) => $c->get(NoteModel::class));
+        $this->container->set(EmailRepositoryInterface::class, fn(Container $c) => $c->get(EmailModel::class));
+
+        $this->container->set(Environment::class, function (Container $c) {
+            $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
+            return new \Twig\Environment($loader);
+        });
+
+        $this->container->set(MailerInterface::class, fn() => new CustomMailer($this->config->mailer['dsn']));
+        return $this;
     }
 
     static public function db(): DB

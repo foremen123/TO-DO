@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заметки</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/CSS/ToDo.css">
+    <title>Заметки</title>
 </head>
 <body>
 <div class="notes-container" role="main">
@@ -54,6 +55,11 @@
                                 <button type="submit" class="edit-button" title="Редактировать">✏️</button>
                             </form>
                         <?php endif; ?>
+
+                            <form method="get" action="/email">
+                                <input type="hidden" name="id" value="<?= $note['id'] ?? null ?>">
+                                <button type="submit" class="sent-button" title="отправить на почту">📩</button>
+                            </form>
 
                         <form method="post" action="/deleteNote">
                             <input type="hidden" name="id" value="<?= $note['id'] ?>">

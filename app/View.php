@@ -25,7 +25,6 @@ class View
             return (string)ob_get_clean();
         } catch (\Exception $e) {
             http_response_code(404);
-            error_log($e->getMessage());
 
             echo View::make('/Errors/Error.404');
             exit;

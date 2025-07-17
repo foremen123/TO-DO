@@ -27,3 +27,9 @@ services:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3308:3306"
+  cron:
+    container_name: my_cron
+    build: ./cron
+    volumes:
+      - ../:/var/www
+      - ./log/cron:/var/log/cron

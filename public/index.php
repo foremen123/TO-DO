@@ -7,16 +7,16 @@ session_start();
 use app\App;
 use app\Config;
 use app\Controllers\AuthController;
+use app\Controllers\EmailController;
 use app\Controllers\HomeController;
 use app\Controllers\NoteController;
 use app\DI\Container;
 use app\Router;
 use app\View;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv:: createImmutable ( dirname(__DIR__ ));
-$dotenv -> load ();
 
 const VIEW_PATH = __DIR__ . '/../views/';
 
@@ -30,6 +30,7 @@ try {
             HomeController::class,
             AuthController::class,
             NoteController::class,
+            EmailController::class
         ]
     );
 } catch (ReflectionException $e) {
@@ -37,11 +38,10 @@ try {
 }
 
 new App(
-    $router,
+    $container,
     [
         'uri' => $_SERVER['REQUEST_URI'],
         'method' => strtolower($_SERVER['REQUEST_METHOD'])
     ],
-    new Config($_ENV),
-    $container
-)->run();
+    $router
+)->boot()->run();

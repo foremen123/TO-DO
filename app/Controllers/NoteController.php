@@ -6,6 +6,7 @@ use app\Attributes\Get;
 use app\Attributes\Post;
 use app\Enums\SortNote;
 use app\Exceptions\NotCreatedNoteException;
+use app\Exceptions\NotUserNameSessionException;
 use app\interface\NoteRepositoryInterface;
 use app\Models\NoteModel;
 use app\NoteHelper\RedirectResponse;
@@ -27,9 +28,13 @@ class NoteController
     public function Todo(): View
     {
         try {
-            $username = $_SESSION['username'];
+            $username = $_SESSION['username'] ?? null;
             $sortParam = $_GET['sort'] ?? null;
             $sort = SortNote::checkFromSort($sortParam);
+
+            if ($username === null) {
+                throw new NotUserNameSessionException('Not found username');
+            }
 
             $notes = $this->noteModel->getNotes($username, $sort);
 
@@ -48,7 +53,10 @@ class NoteController
                     'sorts' => SortNote::cases()
                 ]);
 
-        } catch (Exception $e) {
+        }catch(NotUserNameSessionException){
+
+            return View::make('/Errors/NotUserNameSessionError');
+        }catch (Exception) {
 
             return View::make('/Errors/Error500');
         }

@@ -3,7 +3,8 @@
 namespace app;
 
 /**
- * property-read ?array $config
+ * property-read ?array $db
+ * @property-read ?array $mailer
  */
 
 class Config
@@ -21,6 +22,10 @@ class Config
                     'username' => $env['DB_USERNAME'],
                     'password' => $env['DB_PASSWORD'],
                     'driver' => $env['DB_DRIVER'] ?? 'mysql',
+                ],
+                'mailer' =>
+                [
+                    'dsn' => $env['MAILER_DSN'],
                 ]
             ];
     }

@@ -203,7 +203,7 @@ button[type="submit"]:hover {
     color: white;
 }
 
-.edit-button {
+.edit-button .sent-button {
     background-color: #ffc107;
     color: #333;
 }

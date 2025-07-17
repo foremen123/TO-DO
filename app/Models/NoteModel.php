@@ -24,7 +24,7 @@ class NoteModel extends Model implements NoteRepositoryInterface
         return true;
     }
 
-    public function getNotes(string $username, SortNote $sortSetting): array
+    public function getNotes(?string $username, SortNote $sortSetting): array
     {
         $stmt = $this->db->prepare(
             'SELECT * FROM notes WHERE username = ? ORDER BY ' . $sortSetting->getSort()
@@ -83,5 +83,13 @@ class NoteModel extends Model implements NoteRepositoryInterface
         }
 
         return true;
+    }
+
+    public function getNoteFromEmail(string $id): array
+    {
+        $stmt = $this->db->prepare('SELECT note FROM notes WHERE id = ? ');
+        $stmt->execute([$id]);
+
+        return $stmt->fetch();
     }
 }
