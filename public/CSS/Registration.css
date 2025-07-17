@@ -9,7 +9,6 @@ body {
     font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
-/* Форма */
 form {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 22px;
@@ -23,7 +22,6 @@ form {
     animation: fadeIn 1s ease;
 }
 
-/* Заголовок */
 h1.authorization {
     color: #c31432;
     margin-bottom: 1.5rem;
@@ -32,7 +30,6 @@ h1.authorization {
     letter-spacing: 1.5px;
 }
 
-/* Метки и поля ввода */
 label {
     width: 100%;
     margin-bottom: 1.2rem;
@@ -62,7 +59,6 @@ input[type="password"]:focus {
     background: #fbeaec;
 }
 
-/* Кнопка отправки */
 button[type="submit"] {
     margin-top: 0.7rem;
     padding: 0.7rem 2.5rem;
@@ -83,7 +79,6 @@ button[type="submit"]:hover {
     color: #fff0f3;
 }
 
-/* Сообщение об ошибке */
 .alert {
     background: #ffeaea;
     color: #c31432;
@@ -99,7 +94,6 @@ button[type="submit"]:hover {
     animation: fadeIn 0.8s ease;
 }
 
-/* Анимация */
 @keyframes fadeIn {
     from {
         opacity: 0;
