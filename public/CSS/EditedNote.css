@@ -125,7 +125,7 @@ button[type="submit"]:focus {
     background: linear-gradient(90deg, #c31432 70%, #240b36 100%);
     color: #fff0f3;
 }
-             v
+
 @keyframes fadeIn {
     from {
         opacity: 0;
