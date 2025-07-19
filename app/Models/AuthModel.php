@@ -6,7 +6,9 @@ use app\DB;
 use app\interface\DatabaseInterface;
 use app\Models;
 use app\interface\AuthRepositoryInterface;
+use Doctrine\DBAL\Exception;
 use PDOException;
+use function PHPUnit\Framework\isNull;
 
 class AuthModel extends Model implements AuthRepositoryInterface
 {
@@ -17,30 +19,43 @@ class AuthModel extends Model implements AuthRepositoryInterface
 
     public function registration(string $username, string $password): bool
     {
-        $stmt = $this->db->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+        try {
+            $stmt = $this->db->createBuilder()
+                ->insert('users')
+                ->values([
+                    'username' => ':username',
+                    'password' => ':password'
+                ])
+                ->setParameters(
+                    [   'username' => $username,
+                        'password' => password_hash($password, PASSWORD_BCRYPT)
+                    ])
+                ->executeQuery();
 
-        $hashPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        if (!$stmt->execute([$username, $hashPassword])) {
+            $_SESSION['username'] = $username;
+            return true;
+        } catch (Exception $e) {
             return false;
         }
-        $_SESSION['username'] = $username;
-        return true;
-
     }
 
     public function login(string $username, string $password): bool
     {
-        $stmt = $this->db->prepare('SELECT * FROM users WHERE username = ?');
+        try {
+            $user = $this->db->createBuilder()
+                ->select('*')
+                ->from('users')
+                ->where('username = :username')
+                ->setParameter('username', $username)
+                ->fetchAssociative();
 
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
-
-        if ($user && ($user['username'] === $username && password_verify($password, $user['password']))) {
-            $_SESSION['username'] = $user['username'];
-            return true;
+            if ($user && ($user['username'] === $username && password_verify($password, $user['password']))) {
+                $_SESSION['username'] = $user['username'];
+                return true;
+            }
+        } catch (Exception $e) {
+            return false;
         }
-
         return false;
     }
 }

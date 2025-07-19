@@ -20,6 +20,7 @@ use Dotenv\Dotenv;
 use Exception;
 use Symfony\Component\Mailer\MailerInterface;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class App
 {
@@ -89,8 +90,8 @@ class App
         $this->container->set(EmailRepositoryInterface::class, fn(Container $c) => $c->get(EmailModel::class));
 
         $this->container->set(Environment::class, function (Container $c) {
-            $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
-            return new \Twig\Environment($loader);
+            $loader = new FilesystemLoader(__DIR__ . '/../views');
+            return new Environment($loader);
         });
 
         $this->container->set(MailerInterface::class, fn() => new CustomMailer($this->config->mailer['dsn']));

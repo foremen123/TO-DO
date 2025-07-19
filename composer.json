@@ -7,7 +7,10 @@
         "twig/twig": "^3.21",
         "symfony/mime": "^7.3",
         "symfony/mailer": "^7.3",
-        "symfony/google-mailer": "^7.3"
+        "symfony/google-mailer": "^7.3",
+        "doctrine/orm": "^3",
+        "doctrine/dbal": "^4.3",
+        "symfony/cache": "^7"
     },
 
     "autoload": {

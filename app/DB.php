@@ -6,34 +6,31 @@ namespace app;
 
 use app\Models\PdoWrapper;
 use app\interface\DatabaseInterface;
-use PDO;
-use PDOStatement;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Statement;
+
 
 /**
- * @mixin PDO
+ * @mixin Connection
  */
 
 class DB implements DatabaseInterface
 {
-    private PDO $pdo;
     private pdoWrapper $pdoWrapper;
+    private Connection $connection;
     public function __construct(array $config)
     {
-        try {
-            $dsn = $config['driver'] . ':host=' . $config['host'] . ';dbname=' . $config['database'];
-            $username = $config['username'];
-            $password = $config['password'];
-            $defaultSettings =
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                ];
-            $this->pdo = new PDO ($dsn, $username, $password, $defaultSettings);
+        try{
+
+            $this->connection = DriverManager::getConnection($config);
+
         } catch (\Exception $e) {
             error_log($e->getMessage());
             throw new \Exception($e->getMessage());
         }
-        $this->pdoWrapper = new PdoWrapper($this->pdo);
+        $this->pdoWrapper = new PdoWrapper($this->connection);
     }
 
     public function getPdoWrapper(): DatabaseInterface
@@ -41,8 +38,13 @@ class DB implements DatabaseInterface
         return $this->pdoWrapper;
     }
 
-    public function prepare(string $query): PDOStatement
+    public function prepare(string $query): Statement
     {
-        return $this->pdo->prepare($query);
+        return $this->connection->prepare($query);
+    }
+
+    public function createBuilder(): QueryBuilder
+    {
+        return $this->connection->createQueryBuilder();
     }
 }

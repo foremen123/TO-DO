@@ -34,6 +34,8 @@ try {
         ]
     );
 } catch (ReflectionException $e) {
+    http_response_code(503);
+
     return View::make('/Errors/Error500');
 }
 

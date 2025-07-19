@@ -9,6 +9,8 @@ use app\NoteHelper\RedirectResponse;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
 use PDOException;
+use RuntimeException;
+use function PHPUnit\Framework\throwException;
 
 class AuthController
 {
@@ -31,7 +33,6 @@ class AuthController
     }
 
     #[Post('/registrationUser')]
-
     public function registrationUser(): View|RedirectResponse
     {
         $username = ToDoFormatter::formattedText($_POST['username']);
@@ -46,16 +47,17 @@ class AuthController
         }
 
         try {
-            if ($this->authModel->registration($username, $password)) {
-                return new RedirectResponse('/ToDo');
+            if (!$this->authModel->registration($username, $password)) {
+                throw new PDOException('Failed to register user');
             }
+
+            return new RedirectResponse('/ToDo');
         } catch (PDOException $e) {
             return View::make(
                 '/ToDo/Registration',
                 ['error' => 'Имя занято']
             );
         }
-        return View::make('/Errors/Error500');
     }
 
     #[Post('/authorizationUser')]
@@ -75,6 +77,8 @@ class AuthController
             );
 
         } catch (PDOException $e) {
+
+            http_response_code(500);
             return View::make('/Errors/Error500');
         }
     }

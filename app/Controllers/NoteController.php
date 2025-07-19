@@ -13,6 +13,8 @@ use app\NoteHelper\RedirectResponse;
 use app\NoteHelper\ToDoFormatter;
 use app\View;
 use Exception;
+use RuntimeException;
+use function PHPUnit\Framework\throwException;
 
 
 class NoteController
@@ -56,7 +58,7 @@ class NoteController
         }catch(NotUserNameSessionException){
 
             return View::make('/Errors/NotUserNameSessionError');
-        }catch (Exception) {
+        }catch (RuntimeException) {
 
             return View::make('/Errors/Error500');
         }
@@ -68,15 +70,17 @@ class NoteController
     {
         try {
             if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-                throw new Exception('Not found id');
+                throw new RuntimeException('Not found id');
             }
 
             $id = $_GET['id'];
 
-            $note = $this->noteModel->getNoteId($id);
+            if (!$note = $this->noteModel->getNoteId($id)) {
+                throw new RuntimeException('Failed get to note by id');
+            }
 
             return View::make('/ToDo/EditedNote', ['note' => $note]);
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             http_response_code(502);
 
             return View::make('Errors/Error500');
@@ -91,7 +95,7 @@ class NoteController
             $username = ToDoFormatter::formattedText($_SESSION['username']);
 
             if ($note === '' || $username === '') {
-                throw new Exception('Not found note or username');
+                throw new RuntimeException('Not found note or username');
             }
 
             if (!$this->noteModel->addNote($note, $username)) {
@@ -99,12 +103,12 @@ class NoteController
             }
 
             if (!$this->noteModel->isLoggedIn()) {
-                throw new Exception('You are not logged in');
+                throw new RuntimeException('You are not logged in');
             }
             return new RedirectResponse('/ToDo');
         } catch (NotCreatedNoteException $e) {
             return View::make('/Errors/Error500');
-        } catch (\Exception $e) {
+        } catch (RuntimeException $e) {
             return View::make('/Errors/Error404');
         }
     }
@@ -117,15 +121,15 @@ class NoteController
             $id = $_POST['id'] ??'';
 
             if ($id === '') {
-                throw new Exception('Not found id');
+                throw new RuntimeException('Not found id');
             }
 
             if (!$this->noteModel->deleteNote($id)) {
-                throw new Exception('Not deleted your note');
+                throw new RuntimeException('Not deleted your note');
             }
 
             return new RedirectResponse('/ToDo');
-        } catch (Exception) {
+        } catch (RuntimeException) {
             return View::make('/Errors/Error500');
         }
     }
@@ -139,15 +143,15 @@ class NoteController
             $note = $_POST['editedNote'] ?? '';
 
             if ($id === '' || $note === '') {
-                throw new Exception('Not found id or note');
+                throw new RuntimeException('Not found id or note');
             }
 
             if (!$this->noteModel->editNote($id, $note)) {
-                throw new Exception('This note is not edited');
+                throw new RuntimeException('This note is not edited');
             }
 
             return new RedirectResponse('/ToDo');
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
             return View::make('/Errors/Error500');
         }
     }
@@ -159,20 +163,21 @@ class NoteController
         try {
             $id = $_POST['id'] ?? '';
             if ($id === '') {
-                throw new Exception('Not found id');
+                throw new RuntimeException('Not found id');
             }
 
             $note = $this->noteModel->getNoteId($id);
             if (empty($note)) {
-                throw new Exception('Not found note');
+                throw new RuntimeException('Not found note');
             }
             $completed = $note['completed'] ?? 0;
-            if (! $this->noteModel->setDoneNote($id, !$completed)) {
-                throw new Exception('This note is not completed');
+            if (!$this->noteModel->setDoneNote($id, !$completed)) {
+                throw new RuntimeException('This note is not completed');
             }
 
             return new RedirectResponse('/ToDo');
-        } catch (Exception $e) {
+        } catch (RuntimeException $e) {
+            echo $e;
             return View::make('/Errors/Error500');
         }
     }

@@ -17,11 +17,11 @@ class Config
             [
                 'db' =>
                 [
-                    'host' => $env['DB_HOST'],
-                    'database' => $env['DB_DATABASE'],
-                    'username' => $env['DB_USERNAME'],
-                    'password' => $env['DB_PASSWORD'],
-                    'driver' => $env['DB_DRIVER'] ?? 'mysql',
+                    'driver'   => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
+                    'user'     => $_ENV['DB_USERNAME'],
+                    'password' => $_ENV['DB_PASSWORD'],
+                    'dbname'   => $_ENV['DB_DATABASE'],
+                    'host'     => $_ENV['DB_HOST'],
                 ],
                 'mailer' =>
                 [

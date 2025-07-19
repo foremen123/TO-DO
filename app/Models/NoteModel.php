@@ -6,7 +6,9 @@ use app\interface\DatabaseInterface;
 use app\Models;
 use app\Enums\SortNote;
 use app\interface\NoteRepositoryInterface;
+use Doctrine\DBAL\Exception;
 use PDOException;
+use RuntimeException;
 
 class NoteModel extends Model implements NoteRepositoryInterface
 {
@@ -17,79 +19,121 @@ class NoteModel extends Model implements NoteRepositoryInterface
 
     public function addNote(string $note, string $username): bool
     {
-        $stmt = $this->db->prepare('INSERT INTO notes (note, username) VALUES (?, ?)');
-        if (!$stmt->execute([$note, $username])) {
+        try {
+            $stmt = $this->db->createBuilder()
+                ->insert('notes')
+                ->values([
+                    'note' => ':note',
+                    'username' => ':username'
+                ])
+                ->setParameters([
+                    'note' => $note,
+                    'username' => $username
+                ])
+                ->executeStatement();
+
+            return true;
+        } catch (Exception $e) {
             return false;
         }
-        return true;
     }
 
     public function getNotes(?string $username, SortNote $sortSetting): array
     {
-        $stmt = $this->db->prepare(
-            'SELECT * FROM notes WHERE username = ? ORDER BY ' . $sortSetting->getSort()
-            );
-        if (!$stmt->execute([$username])) {
-            throw new PDOException('note receipt failed');
+        try {
+            return $this->db->createBuilder()
+                ->select('*')
+                ->from('notes')
+                ->where('username = :username')
+                ->setParameter('username', $username)
+                ->orderBy($sortSetting->getSort())
+                ->fetchAllAssociative();
+        } catch (Exception $e) {
+            throw new RuntimeException('note receipt failed: ' . $e->getMessage());
         }
-            return $stmt->fetchAll();
-
-
     }
 
     public function deleteNote(string $id): bool
     {
-        $stmt = $this->db->prepare('DELETE FROM notes WHERE id = ?');
-        if (!$stmt->execute([$id])){
-            throw new PDOException('note could\'nt be deleted');
-        }
+        try {
+            $this->db->createBuilder()
+                ->delete('notes')
+                ->where('id = :id')
+                ->setParameter('id', $id)
+                ->executeStatement();
 
-        return true;
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function getNoteId(string $id): array
     {
-        $stmt = $this->db->prepare('SELECT * FROM notes WHERE id = ?');
+        try {
+            return $this->db->createBuilder()
+                ->select('*')
+                ->from('notes',)
+                ->where('id = :id')
+                ->setParameter('id', $id)
+                ->fetchAssociative();
 
-        if(!$stmt->execute([$id])) {
-            throw new PDOException('note could\'nt be received');
+        } catch (Exception $e) {
+            throw new RuntimeException('Note not found: ' . $e->getMessage());
         }
-
-        return $stmt->fetch();
     }
 
     public function editNote(string $id, string $note): bool
     {
-        $stmt = $this->db->prepare(
-            'UPDATE notes SET note = :note, date = CURRENT_TIMESTAMP WHERE id = :id'
-        );
+        try {
+            $stmt = $this->db->createBuilder()
+                ->update('notes', 'n')
+                ->set('note', ':note')
+                ->set('date', 'CURRENT_TIMESTAMP')
+                ->where('id', ':id')
+                ->setParameters([
+                    'note' => $note,
+                    'id' => $id
+                ])
+                ->executeStatement();
 
-        if (!$stmt->execute([':note' => $note,  ':id' => $id])) {
-            throw new PDOException('Note could\'nt be updated');
+            return true;
+        } catch (Exception $e) {
+            return false;
         }
-
-        if ($stmt->rowCount() === 0) {
-            throw new PDOException('Note not found or not updated');
-        }
-        return true;
     }
 
     public function setDoneNote(string $id, bool $completed): bool
     {
-        $stmt = $this->db->prepare('UPDATE notes SET completed = ? WHERE id = ?');
+        try {
+            $this->db->createBuilder()
+                ->update('notes')
+                ->set('completed', ':completed')
+                ->where('id = :id')
+                ->setParameters([
+                    'completed' => (int) $completed,
+                    'id' => $id
+                ])
+                ->executeStatement();
 
-        if (!$stmt->execute([(int) $completed, $id])) {
-            throw new PDOException('Failed to update completed');
+            return true;
+        } catch (Exception $e) {
+            return false;
         }
-
-        return true;
     }
 
     public function getNoteFromEmail(string $id): array
     {
-        $stmt = $this->db->prepare('SELECT note FROM notes WHERE id = ? ');
-        $stmt->execute([$id]);
+        try {
+            return $this->db->createBuilder()
+                ->select('*')
+                ->from('notes', )
+                ->where('id = :id')
+                ->setParameter('id', $id)
+                ->fetchAssociative();
+        } catch (Exception $e) {
 
-        return $stmt->fetch();
+            throw new RuntimeException('Note not found: ' . $e->getMessage());
+        }
     }
 }
