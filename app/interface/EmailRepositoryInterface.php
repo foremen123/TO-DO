@@ -10,7 +10,6 @@ interface EmailRepositoryInterface
         string $recipient,
         string $htmlBody,
         string $textBody,
-        string $subject = '',
     ): bool;
     public function getEmailByStatus(Queue $status): array;
     public function updateStatusMessage(int $id, Queue $status): bool;

@@ -126,7 +126,7 @@ class NoteModel extends Model implements NoteRepositoryInterface
     {
         try {
             return $this->db->createBuilder()
-                ->select('*')
+                ->select('note')
                 ->from('notes', )
                 ->where('id = :id')
                 ->setParameter('id', $id)

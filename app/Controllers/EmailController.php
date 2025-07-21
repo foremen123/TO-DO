@@ -13,6 +13,7 @@ use app\NoteHelper\RedirectResponse;
 use app\View;
 use Exception;
 use PDOException;
+use RuntimeException;
 use Twig\Environment;
 
 class EmailController
@@ -43,20 +44,20 @@ class EmailController
             }
 
             $subject = 'Ваша заметка';
-            $textBody = implode($this->noteModel->getNoteFromEmail($id));
+            $textBody = implode( $this->noteModel->getNoteFromEmail($id));
             $htmlBody = $this->twig->render('/ToDo/Email.twig', ['note_text' => $textBody]);
 
             if (!$this->emailModel->addQueue(
                 $recipient,
                 $htmlBody,
-                $textBody,
-                $subject
+                $textBody
             )) {
-                throw new PDOException('Failed to add a new note into queue');
+                throw new RuntimeException('Failed to add a new note into queue');
             }
 
             return View::make('ToDo/Email/Succeed');
-        } catch (PDOException $e) {
+        } catch (RuntimeException $e) {
+            echo $e;
             return View::make('/Errors/Error500');
         } catch (Exception $e) {
            return View::make('/Errors/NotUserNameSessionError');

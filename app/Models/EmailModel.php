@@ -5,7 +5,10 @@ namespace app\Models;
 use app\Enums\Queue;
 use app\interface\DatabaseInterface;
 use app\interface\EmailRepositoryInterface;
+use Doctrine\DBAL\Exception;
 use PDOException;
+use RuntimeException;
+use Throwable;
 
 class EmailModel extends Model implements EmailRepositoryInterface
 {
@@ -18,77 +21,121 @@ class EmailModel extends Model implements EmailRepositoryInterface
         string $recipient,
         string $htmlBody,
         string $textBody,
-        string $subject = '',
     ): bool
     {
-        $queue = Queue::Pending;
-        $stmt = $this->db->prepare(
-            'INSERT INTO mailer_queue(
-                         recipient, html_body, text_body, status, created_at)
-                        VALUES (:recipient , :htmlBody, :textBody, :status, NOW())');
-
-        if (!$stmt->execute(
-            [
-                ':recipient' => $recipient,
-                ':htmlBody' => $htmlBody,
-                ':textBody' => $textBody,
-                ':status' => $queue->getQueue(),
-            ]))
-        {
+    $status = Queue::Pending;
+        try {
+            $this->db->createBuilder()
+                ->insert('mailer_queue')
+                ->values([
+                    'recipient' => ':recipient',
+                    'html_body' => ':html',
+                    'text_body' => ':text',
+                    'status' => ':status',
+                    'created_at' => ':created_at'
+                ])
+                ->setParameters([
+                    'recipient' => $recipient,
+                    'html' => $htmlBody,
+                    'text' => $textBody,
+                    'status' => $status->value,
+                    'created_at' => date('Y-m-d H:i:s')
+                ])
+                ->executeStatement();;
+            return true;
+        } catch (Throwable $e) {
+            echo $e->getMessage() . $e->getCode() . ' ';
             return false;
         }
-
-        return true;
     }
 
     public function getEmailByStatus(Queue $status): array
     {
-        $stmt = $this->db->prepare('SELECT * FROM mailer_queue WHERE status = ?');
-
-        if (!$stmt->execute([$status->getQueue()])) {
-            throw new PDOException('Not execute this status message');
+        try {
+            return $this->db->createBuilder()
+                ->select('*')
+                ->from('mailer_queue')
+                ->where('status = :status')
+                ->setParameter('status', $status->getQueue())
+                ->fetchAllAssociative();
+        } catch (Throwable) {
+            throw new RuntimeException('Not execute thus status message');
         }
-
-        return $stmt->fetchAll();
     }
 
     public function updateStatusMessage(int $id, Queue $status): bool
     {
-        $stmt = $this->db->prepare('UPDATE mailer_queue SET status = ?, send_at = NOW() WHERE id = ?');
 
-        if (!$stmt->execute([$status->getQueue(), $id])) {
+        try {
+            $this->db->createBuilder()
+                ->update('mailer_queue')
+                ->set('status', ':status')
+                ->set('send_at', ':send_at')
+                ->where('id = :id')
+                ->setParameters([
+                    'status'  => $status->value,
+                    'send_at' => date('Y-m-d H:i:s'),
+                    'id' => $id,
+                ])
+                ->executeStatement();
+            return true;
+        } catch (Throwable) {
             return false;
         }
-        return true;
     }
 
 
     public function setEmailFromUser(string $id, string $email): bool
     {
-        $stmt = $this->db->prepare('UPDATE users SET email = ? WHERE id = ?');
-        if (!$stmt->execute([$email, $id])) {
+        try {
+            $this->db->createBuilder()
+                ->update('users')
+                ->set('email', ':email')
+                ->where('id = :id')
+                ->setParameters([
+                    'email' => $email,
+                    'id' => $id
+                ])
+                ->executeStatement();
+            return true;
+        } catch (Throwable) {
             return false;
         }
-        return true;
     }
 
     public function getEmailByUserId(string $id): ?string
     {
-        $stmt = $this->db->prepare('SELECT email FROM users WHERE id = ?');
-        if ($stmt->execute([$id])) {
-            $result = $stmt->fetch();
-            return $result['email'] ?? null;
-        }
+        try {
+             $result = $this->db->createBuilder()
+                ->select('email')
+                ->from('users')
+                ->where('id = :id')
+                ->setParameter('id', $id)
+                ->fetchAssociative();
 
-        return null;
+            return $result['email'] ?? null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     public function updateStatusWithError(int $id, Queue $status, string $errorMessage): bool
     {
-        $stmt = $this->db->prepare(
-            'UPDATE mailer_queue SET status = ?, error_message = ? WHERE id = ?'
-        );
-
-        return $stmt->execute([$status->getQueue(), $errorMessage, $id]);
+        try {
+            $this->db->createBuilder()
+                ->update('mailer_queue')
+                ->set('status', ':status')
+                ->set('error_message', ':error_message')
+                ->where('id = :id')
+                ->setParameters([
+                    'status' => $status->getQueue(),
+                    'error_message' => $errorMessage,
+                    'id' => $id
+                ])
+                ->executeStatement();
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
     }
 }
